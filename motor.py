@@ -3,12 +3,12 @@ from machine import Pin
 class Motor:
     def __init__(self, pins, invertDirection=False, currentPosition=0):
         self.pins = []
-        self.powerPattern = [
-            [1, 0, 1, 0],
-            [0, 1, 1, 0],
-            [0, 1, 0, 1],
-            [1, 0, 0, 1]
-        ]
+        self.powerPattern = (
+            (1, 0, 1, 0),
+            (0, 1, 1, 0),
+            (0, 1, 0, 1),
+            (1, 0, 0, 1)
+        )
         for pin in pins:
             self.pins.append(Pin(pin, Pin.OUT))
         self.position = currentPosition
@@ -18,13 +18,25 @@ class Motor:
 
     def step(self): # step the motor
         self.position += self.direction
-        patternPosition = int((-1 * self.position + 5) % len(self.powerPattern))
+        patternPosition = (-self.position + 5) % 4
         pattern = self.powerPattern[patternPosition]
-        for i in range(len(pattern)):
-            if pattern[i] == 0:
-                self.pins[i].low()
-            elif pattern[i] == 1:
-                self.pins[i].high()
+        pins = self.pins
+        if pattern[0]:
+            pins[0].high()
+        else:
+            pins[0].low()
+        if pattern[1]:
+            pins[1].high()
+        else:
+            pins[1].low()
+        if pattern[2]:
+            pins[2].high()
+        else:
+            pins[2].low()
+        if pattern[3]:
+            pins[3].high()
+        else:
+            pins[3].low()
                
        
        

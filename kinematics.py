@@ -4,6 +4,7 @@ import utime
 
 class Move:
     def __init__(self, motors, tickTimeUs=2000):
+        self.times = []
         for motor in motors:
             motor.enable()
         self.motors = motors
@@ -14,9 +15,9 @@ class Move:
 
     def updateMotors(self):
         self.temporalPosition += self.tickTimeUs
-        print(f'before IK: {utime.ticks_us()}')
+        self.times.append(f'before IK: {utime.ticks_us()}')
         steps = self.moveFunction(self.temporalPosition)
-        print(f'after IK: {utime.ticks_us()}')
+        self.times.append(f'after IK: {utime.ticks_us()}')
         if not steps:
             return
         i = 0
@@ -24,11 +25,14 @@ class Move:
             currentPosition = motor.position
             gap = steps[i] - currentPosition
             i += 1
-            if abs(gap) > 0.5: #move motor if that would bring the position closer to the target
-                motor.setDirection(int(math.copysign(1, gap)))
-                print(f'before step: {utime.ticks_us()}')
+            if gap != 0: #move motor if that would bring the position closer to the target
+                if gap > 0:
+                    motor.setDirection(1)
+                else:
+                    motor.setDirection(-1)
+                self.times.append(f'before step: {utime.ticks_us()}')
                 motor.step()
-                print(f'after step: {utime.ticks_us()}')
+                self.times.append(f'after step: {utime.ticks_us()}')
 
     @micropython.native
     def getAllSteps(self, xBoard: float, yBoard: float) -> tuple: # return all lengths given the board coordinates
