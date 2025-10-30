@@ -30,6 +30,7 @@ class Motor:
        
     def enable(self): # enable h-bridge driver to start sending power to motor. Motor should only be enabled while moving to prevent overheating
         self.pins[4].high()
+        
        
     def disable(self): # disable h-bridge driver
         self.pins[4].low()

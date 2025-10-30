@@ -5,7 +5,8 @@ def stepFromREPL(motor, timePerStepUs=2000):
     counter = 0
     while True:
         print(f'Number of steps traveled: {counter}\n')
-        steps = 100
+        steps = 50
+        100
         input()
         if steps == 'reset':
             counter = 0

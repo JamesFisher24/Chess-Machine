@@ -1,38 +1,33 @@
 import math
+import utime
 
 class Move:
     def __init__(self, motors, tickTimeUs=2000):
+        for motor in motors:
+            motor.enable()
         self.motors = motors
         self.tickTimeUs = tickTimeUs
         self.temporalPosition = 0 # t value for the move. Should be the same as the time since the begining of the move if the move was not paused
         self.complete = False
         print(self.temporalPosition)
 
-<<<<<<< HEAD
-=======
-    def moveComplete(self):
-        self.complete = True
-        for motor in self.motors:
-            motor.disable()
-        
-
->>>>>>> 0fc36a9 (Changed Move class to include motor initialization and deinitialization)
     def updateMotors(self):
         self.temporalPosition += self.tickTimeUs
+        print(f'before IK: {utime.ticks_us()}')
         steps = self.moveFunction(self.temporalPosition)
+        print(f'after IK: {utime.ticks_us()}')
         if not steps:
             return
         i = 0
         for motor in self.motors:
             currentPosition = motor.position
-            print(f'current position = {currentPosition}')
-            print(f'needed position = {steps[i]}')
             gap = steps[i] - currentPosition
-            print(f'gap = {gap}')
             i += 1
             if abs(gap) > 0.5: #move motor if that would bring the position closer to the target
                 motor.setDirection(int(math.copysign(1, gap)))
+                print(f'before step: {utime.ticks_us()}')
                 motor.step()
+                print(f'after step: {utime.ticks_us()}')
 
     def getAllSteps(self, xBoard, yBoard): # return all lengths given the board coordinates
         def mapFromBoard(n):
@@ -68,11 +63,6 @@ class Move:
 
 class ParametricLineMove(Move):
     def __init__(self, x1, x2, y1, y2, motors, tickTimeUs=2000):
-<<<<<<< HEAD
-=======
-        for motor in motors:
-            motor.enable()
->>>>>>> 0fc36a9 (Changed Move class to include motor initialization and deinitialization)
         super().__init__(motors, tickTimeUs=tickTimeUs)
         self.motors = motors
         self.x1 = x1
@@ -85,11 +75,7 @@ class ParametricLineMove(Move):
     def moveFunction(self, microSec):
         if self.temporalPosition > self.scalingFactor * 1000000:
             print(f"Move Complete at time {self.temporalPosition}")
-<<<<<<< HEAD
             self.complete = True
-=======
-            super().moveComplete()
->>>>>>> 0fc36a9 (Changed Move class to include motor initialization and deinitialization)
             return
         return self.parametricLine(microSec, self.x1, self.x2, self.y1, self.y2, self.scalingFactor)
         
@@ -150,7 +136,6 @@ class ParametricLineMove(Move):
         denominator = sqrtTerm
 
         return numerator / denominator
-    
 
 '''
  ___________________
@@ -162,8 +147,8 @@ class ParametricLineMove(Move):
 | Motor Positions |
  -----------------
 
-2------3
+3------4
 |      |
 |      |
-0------1
+1------2
 '''
