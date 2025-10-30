@@ -1,3 +1,4 @@
+import micropython
 import math
 import utime
 
@@ -29,34 +30,37 @@ class Move:
                 motor.step()
                 print(f'after step: {utime.ticks_us()}')
 
-    def getAllSteps(self, xBoard, yBoard): # return all lengths given the board coordinates
-        def mapFromBoard(n):
-            if n > 8 or n < 1:
-                print(f'Requested board position {n} is out of range')
-                return
-            return 10 + (float(n - 1) * 28.71428)
-
-        a = 0.0113142 # parabolic constants for string spool diameter compensation
+    @micropython.native
+    def getAllSteps(self, xBoard: float, yBoard: float) -> tuple: # return all lengths given the board coordinates
+        # parabolic constants for string spool diameter compensation
+        a = 0.0113142
         b = 16.9572
         c = -663.986
 
-        x = mapFromBoard(xBoard) # Convert board coordinates to millimeters
-        y = mapFromBoard(yBoard)
+        # Convert board coordinates to millimeters
+        x = 10.0 + (xBoard - 1.0) * 28.71428
+        y = 10.0 + (yBoard - 1.0) * 28.71428
 
-        a1 = x + 17
-        b1 = y + 17
-        a2 = 238 - x
-        b3 = 238 - y
+        a1 = x + 17.0
+        b1 = y + 17.0
+        a2 = 238.0 - x
+        b3 = 238.0 - y
 
-        a1Sq = (x + 17) ** 2
-        b1Sq = (y + 17) ** 2
-        a2Sq = (238 - x) ** 2
-        b3Sq = (238 - y) ** 2
+        a1_sq = a1 * a1
+        b1_sq = b1 * b1
+        a2_sq = a2 * a2
+        b3_sq = b3 * b3
 
-        s1 = round(a * (a1Sq + b1Sq) + (b * math.sqrt(a1Sq + b1Sq)) + c)
-        s2 = round(a * (a2Sq + b1Sq) + (b * math.sqrt(a2Sq + b1Sq)) + c)
-        s3 = round(a * (a1Sq + b3Sq) + (b * math.sqrt(a1Sq + b3Sq)) + c)
-        s4 = round(a * (a2Sq + b3Sq) + (b * math.sqrt(a2Sq + b3Sq)) + c)
+        sum_sq_1 = a1_sq + b1_sq
+        sum_sq_2 = a2_sq + b1_sq
+        sum_sq_3 = a1_sq + b3_sq
+        sum_sq_4 = a2_sq + b3_sq
+
+        # Using math.sqrt from the math module
+        s1 = int(a * sum_sq_1 + b * math.sqrt(sum_sq_1) + c)
+        s2 = int(a * sum_sq_2 + b * math.sqrt(sum_sq_2) + c)
+        s3 = int(a * sum_sq_3 + b * math.sqrt(sum_sq_3) + c)
+        s4 = int(a * sum_sq_4 + b * math.sqrt(sum_sq_4) + c)
 
         return s1, s2, s3, s4
 
@@ -79,8 +83,9 @@ class ParametricLineMove(Move):
             return
         return self.parametricLine(microSec, self.x1, self.x2, self.y1, self.y2, self.scalingFactor)
         
-    def parametricLine(self, microSec, x1, x2, y1, y2, scalingFactor): # Calculate where each motor should be at a specific micro second time during a move
-        timeSec = microSec / 1000000
+    @micropython.native
+    def parametricLine(self, microSec: int, x1: float, x2: float, y1: float, y2: float, scalingFactor: float) -> tuple: # Calculate where each motor should be at a specific micro second time during a move
+        timeSec = microSec / 1000000.0
         targetX = x1 + (x2 - x1) * (timeSec / scalingFactor)
         targetY = y1 + (y2 - y1) * (timeSec / scalingFactor)
         steps = self.getAllSteps(targetX, targetY)
@@ -111,8 +116,8 @@ class ParametricLineMove(Move):
         timeScalingFactor = unscaledMaxSpeed / maxMotorSpeed
         return timeScalingFactor + 0.2
     
-    def ds_dt(self, t, x1, x2, y1, y2): # Calculate the speed of any motor at a given time position on its path
-        print(x1, y1, x2, y2)
+    @micropython.native
+    def ds_dt(self, t: float, x1: float, x2: float, y1: float, y2: float) -> float: # Calculate the speed of any motor at a given time position on its path
         a = 0.0113142
         b = 16.9572
         dx = x2 - x1
@@ -122,16 +127,15 @@ class ParametricLineMove(Move):
         term_x = t * dx - x1 + const
         term_y = t * dy - y1 + const
 
-        sqrtTerm = math.sqrt(term_x**2 + term_y**2)
+        sqrtTerm = math.sqrt(term_x*term_x + term_y*term_y)
 
         # Check for division by zero
         if sqrtTerm == 0:
             print("derivative error. Division by zero")
-            return 0
+            return 0.0
         
         numerator1 = 1649.0197518368 * a * (-dx * term_x - dy * term_y) * sqrtTerm
         numerator2 = 14.35714 * b * (2 * -dx * term_x + 2 * -dy * term_y)
-        print(numerator1, numerator2)
         numerator = numerator1 + numerator2
         denominator = sqrtTerm
 

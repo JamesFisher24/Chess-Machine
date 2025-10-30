@@ -17,7 +17,5 @@ portMapping = [1, 3, 2, 4] # port number in order of board position
 currentMove = kinematics.ParametricLineMove(8, 8, 8, 1, motors, tickTimeUs=2000)
 print(currentMove.scalingFactor)
 while not currentMove.complete:
-    print(f'before update call: {utime.ticks_us()}')
     currentMove.updateMotors()
-    print(f'after update call: {utime.ticks_us()}')
     utime.sleep_us(currentMove.tickTimeUs)
