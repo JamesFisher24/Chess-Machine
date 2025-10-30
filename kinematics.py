@@ -8,6 +8,15 @@ class Move:
         self.complete = False
         print(self.temporalPosition)
 
+<<<<<<< HEAD
+=======
+    def moveComplete(self):
+        self.complete = True
+        for motor in self.motors:
+            motor.disable()
+        
+
+>>>>>>> 0fc36a9 (Changed Move class to include motor initialization and deinitialization)
     def updateMotors(self):
         self.temporalPosition += self.tickTimeUs
         steps = self.moveFunction(self.temporalPosition)
@@ -59,6 +68,11 @@ class Move:
 
 class ParametricLineMove(Move):
     def __init__(self, x1, x2, y1, y2, motors, tickTimeUs=2000):
+<<<<<<< HEAD
+=======
+        for motor in motors:
+            motor.enable()
+>>>>>>> 0fc36a9 (Changed Move class to include motor initialization and deinitialization)
         super().__init__(motors, tickTimeUs=tickTimeUs)
         self.motors = motors
         self.x1 = x1
@@ -71,7 +85,11 @@ class ParametricLineMove(Move):
     def moveFunction(self, microSec):
         if self.temporalPosition > self.scalingFactor * 1000000:
             print(f"Move Complete at time {self.temporalPosition}")
+<<<<<<< HEAD
             self.complete = True
+=======
+            super().moveComplete()
+>>>>>>> 0fc36a9 (Changed Move class to include motor initialization and deinitialization)
             return
         return self.parametricLine(microSec, self.x1, self.x2, self.y1, self.y2, self.scalingFactor)
         
