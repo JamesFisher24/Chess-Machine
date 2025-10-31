@@ -1,6 +1,6 @@
 import utime
 import motor
-import kinematics
+import kinematics_cython as kinematics
 from debug import stepFromREPL
 
 motors = [
@@ -13,7 +13,7 @@ motors = [
 portMapping = [1, 3, 2, 4] # port number in order of board position
 
 
-
+'''
 currentMove = kinematics.ParametricLineMove(8, 8, 8, 1, motors, tickTimeUs=2000)
 print(currentMove.scalingFactor)
 while not currentMove.complete:
@@ -23,3 +23,5 @@ while not currentMove.complete:
     utime.sleep_us(currentMove.tickTimeUs)
     print(currentMove.times)
     currentMove.times = []
+    '''
+stepFromREPL(motors[2])
