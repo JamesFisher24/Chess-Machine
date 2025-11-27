@@ -1,7 +1,8 @@
 import utime
-import motor
-import kinematics_cython as kinematics
+import motor_sio as motor
+import kinematics
 from debug import stepFromREPL
+import gc
 
 motors = [
     motor.Motor(pins=[20,17,18,19,16], invertDirection=True, currentPosition=6503),
@@ -12,16 +13,16 @@ motors = [
 
 portMapping = [1, 3, 2, 4] # port number in order of board position
 
+# Manually trigger garbage collection before the main loop
+gc.collect()
 
-'''
-currentMove = kinematics.ParametricLineMove(8, 8, 8, 1, motors, tickTimeUs=2000)
+currentMove = kinematics.PrecalculatedMove(8, 8, 8, 1, motors, tickTimeUs=2000) # Set tickTimeUs to 2000
 print(currentMove.scalingFactor)
 while not currentMove.complete:
-    currentMove.times.append(f'before update: {utime.ticks_us()}')
+    #print(f'before update call: {utime.ticks_us()}')
+    #print(f'mem_free: {gc.mem_free()}, mem_alloc: {gc.mem_alloc()}')
     currentMove.updateMotors()
-    currentMove.times.append(f'after update: {utime.ticks_us()}')
-    utime.sleep_us(currentMove.tickTimeUs)
-    print(currentMove.times)
-    currentMove.times = []
-    '''
-stepFromREPL(motors[2])
+    #print(f'after update call: {utime.ticks_us()}')
+    # utime.sleep_us(currentMove.tickTimeUs) # Remove sleep
+
+# stepFromREPL(motors[3])
