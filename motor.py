@@ -47,7 +47,7 @@ class Motor:
         position += direction
         self.position = position
 
-        patternPosition = int((-1 * position + 5) % 4)
+        patternPosition = (1 - position) & 3
         set_mask = self.step_masks[patternPosition]
 
         mem32[GPIO_OUT_SET] = set_mask
