@@ -9,9 +9,9 @@ _POWER_PATTERN = const((
 ))
 
 # SIO registers base address
-SIO_BASE = const(0xd0000000)
-GPIO_OUT_SET = const(SIO_BASE + 0x14)
-GPIO_OUT_CLR = const(SIO_BASE + 0x18)
+MEM_BASE = const(0xd0000000)
+GPIO_OUT_SET = const(MEM_BASE + 0x14)
+GPIO_OUT_CLR = const(MEM_BASE + 0x18)
 
 class Motor:
     def __init__(self, pins, invertDirection=False, currentPosition=0):

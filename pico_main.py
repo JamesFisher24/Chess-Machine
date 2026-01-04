@@ -4,10 +4,10 @@ from machine import UART, Timer
 
 # --- Motor Setup ---
 motors = [
-    motor.Motor(pins=[20,17,18,19,16], invertDirection=True, currentPosition=6503),
-    motor.Motor(pins=[11,13,12,14,15]),
-    motor.Motor(pins=[10,7,9,21,8], invertDirection=False, currentPosition=3826),
-    motor.Motor(pins=[2,3,4,6,5], invertDirection=False, currentPosition=5980)
+    motor.Motor(pins=[20,17,18,19,16], invertDirection=True),
+    motor.Motor(pins=[11,13,12,14,15], invertDirectioin=False),
+    motor.Motor(pins=[10,7,9,21,8], invertDirection=False),
+    motor.Motor(pins=[2,3,4,6,5], invertDirection=False)
 ]
 
 # --- UART Setup ---
