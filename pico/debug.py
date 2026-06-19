@@ -1,12 +1,11 @@
 import math
 import utime
 
-def stepFromREPL(motor, timePerStepUs=2000):
+def stepFromREPL(motor, timePerStepUs=3000):
     counter = 0
     while True:
         print(f'Number of steps traveled: {counter}\n')
-        steps = 50
-        100
+        steps = -50
         input()
         if steps == 'reset':
             counter = 0
@@ -20,4 +19,5 @@ def stepFromREPL(motor, timePerStepUs=2000):
         for i in range(abs(steps)):
             motor.step()
             utime.sleep_us(timePerStepUs)
+        utime.sleep_us(100)
         motor.disable()
